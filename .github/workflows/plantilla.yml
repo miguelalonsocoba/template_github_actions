@@ -1,25 +1,27 @@
+# example 2: on merge to master from pull request (recommended)
 name: Bump version
 on:
   pull_request:
+    types:
+      - closed
     branches:
-      - main
-  push:
-    branches:
-      - main
+      - master
+
 jobs:
   build:
-    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: "0"
+
       - name: Bump version and push tag
-        id: tag_version
-        uses: mathieudutour/github-tag-action@v6.2
-        with:
-          github_token: ${{ secrets.TOKEN_SUPER }}
-      - name: Create a GitHub release
-        uses: ncipollo/release-action@v1
-        with:
-          github_token: ${{ secrets.TOKEN_SUPER }}
-          tag: ${{ steps.tag_version.outputs.new_tag }}
-          name: Release ${{ steps.tag_version.outputs.new_tag }}
-          body: ${{ steps.tag_version.outputs.changelog }}
+        uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+        env:
+          GITHUB_TOKEN: ${{secrets.TOKEN_SUPER }} # if you don't want to set write permissions use a PAT token
+          WITH_V: true
+          PRERELEASE: true
