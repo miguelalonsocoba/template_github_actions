@@ -1,11 +1,14 @@
 # example 2: on merge to master from pull request (recommended)
 name: Bump version
 on:
+  push:
+    branches:
+      - main
   pull_request:
     types:
       - closed
     branches:
-      - master
+      - main
 
 jobs:
   build:
