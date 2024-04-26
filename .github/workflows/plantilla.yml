@@ -1,10 +1,10 @@
 # example 2: on merge to master from pull request (recommended)
 name: Bump version
 on:
-  push:
+  pull_request:
     branches:
       - main
-  pull_request:
+  push:
     branches:
       - main
 
