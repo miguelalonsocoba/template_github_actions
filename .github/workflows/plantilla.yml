@@ -14,14 +14,23 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: "0"
 
       - name: Bump version and push tag
+        id: github_tag
         uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
         env:
           GITHUB_TOKEN: ${{secrets.TOKEN_SUPER }} # if you don't want to set write permissions use a PAT token
           WITH_V: true
           PRERELEASE: true
+          DEFAULT_BUMP: patch
+          RELEASE_BRANCHES: main, release, hotfix
+
+      - name: Print version
+        run: echo  "New Tag: + "${{ steps.github_tag.outputs.new_tag }}
+        run: echo  "Tag: + "${{ steps.github_tag.outputs.tag }}
+        run: echo  "Part: + "${{ steps.github_tag.outputs.part }}
