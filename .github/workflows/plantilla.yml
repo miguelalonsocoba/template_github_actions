@@ -1,5 +1,4 @@
-# example 2: on merge to master from pull request (recommended)
-name: Bump version
+name: Automatic version control. Docker image build and deployment.
 on:
   pull_request:
     types:
@@ -14,7 +13,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - name: Checkout repo
+      - name: Review code
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
@@ -22,7 +21,7 @@ jobs:
 
       - name: Bump version and push tag
         id: github_tag
-        uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+        uses: anothrNick/github-tag-action@v1
         env:
           GITHUB_TOKEN: ${{secrets.TOKEN_SUPER }}
           WITH_V: true
@@ -36,3 +35,24 @@ jobs:
           echo  "New tag: $NEW_TAG"
           echo  "Tag: $TAG"
           echo  "Part: $PART"
+      # --------------------
+      - name: Login to DockerHub
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          docker login --username $DOCKERHUB_USERNAME --password $DOCKERHUB_TOKEN
+
+      - name: Build Docker image
+        env:
+          NEW_VERSION: ${{ steps.github_tag.outputs.new_tag }}
+        run: |
+          docker build --tag miguetheking/template_github_actions:$NEW_VERSION .
+          docker build --tag miguetheking/template_github_actions:latest .
+
+      - name: Publish image to Dockerhub
+        env:
+          NEW_VERSION: ${{ steps.github_tag.outputs.new_tag }}
+        run: |
+          docker push miguetheking/template_github_actions:$NEW_VERSION
+          docker push miguetheking/template_github_actions:latest
