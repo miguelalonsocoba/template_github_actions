@@ -31,6 +31,11 @@ jobs:
           RELEASE_BRANCHES: main, release, hotfix
 
       - name: Print version
-        run: echo  "New Tag: + "${{ steps.github_tag.outputs.new_tag }}
-        run: echo  "Tag: + "${{ steps.github_tag.outputs.tag }}
-        run: echo  "Part: + "${{ steps.github_tag.outputs.part }}
+        env:
+          NEW_TAG: ${{ steps.github_tag.outputs.new_tag }}
+          TAG: ${{ steps.github_tag.outputs.tag }}
+          PART: ${{ steps.github_tag.outputs.part }}
+        run: |
+          echo  "New tag: $NEW_TAG"
+          echo  "Tag: $TAG"
+          echo  "Part: $PART"
