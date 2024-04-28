@@ -26,16 +26,6 @@ jobs:
           GITHUB_TOKEN: ${{secrets.TOKEN_SUPER }}
           WITH_V: true
 
-      - name: Print version
-        env:
-          NEW_TAG: ${{ steps.github_tag.outputs.new_tag }}
-          TAG: ${{ steps.github_tag.outputs.tag }}
-          PART: ${{ steps.github_tag.outputs.part }}
-        run: |
-          echo  "New tag: $NEW_TAG"
-          echo  "Tag: $TAG"
-          echo  "Part: $PART"
-      # --------------------
       - name: Login to DockerHub
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
